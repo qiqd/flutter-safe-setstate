@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_safe_setstate/safe_setstate.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:safe_setstate/safe_setstate.dart';
 
 void main() {
   testWidgets('safeSetState should update state when widget is mounted', (

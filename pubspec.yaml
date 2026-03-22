@@ -1,4 +1,4 @@
-name: safe_setstate
+name: flutter_safe_setstate
 description: "A Flutter package that provides a safe setState extension to prevent calling setState on disposed widgets."
 version: 1.0.0
 homepage: https://github.com/qiqd/flutter-safe-setstate

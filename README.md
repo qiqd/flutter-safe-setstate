@@ -1,4 +1,4 @@
-# safe_setstate
+# flutter_safe_setstate
 
 A Flutter package that provides a safe setState extension to prevent calling setState on disposed widgets.
 
@@ -15,7 +15,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  safe_setstate: ^1.0.0
+  flutter_safe_setstate: ^1.0.0
 ```
 
 Then run:
@@ -29,7 +29,7 @@ flutter pub get
 Simply import the package and use `safeSetState` instead of `setState`:
 
 ```dart
-import 'package:safe_setstate/safe_setstate.dart';
+import 'package:flutter_safe_setstate/safe_setstate.dart';
 
 class MyWidget extends StatefulWidget {
   @override
@@ -85,6 +85,6 @@ Future<void> fetchData() async {
 
 ## Additional information
 
-For more information, visit the [GitHub repository](https://github.com/your-username/safe_setstate).
+For more information, visit the [GitHub repository](https://github.com/qiqd/flutter-safe-setstate).
 
-If you find any issues or have suggestions, please file them on the [issue tracker](https://github.com/your-username/safe_setstate/issues).
+If you find any issues or have suggestions, please file them on the [issue tracker](https://github.com/qiqd/flutter-safe-setstate/issues).
