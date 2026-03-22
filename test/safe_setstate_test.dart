@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_safe_setstate/safe_setstate.dart';
+import 'package:flutter_safe_setstate/flutter_safe_setstate.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
