@@ -1,3 +1,10 @@
+## 1.0.1
+
+- Added comprehensive API documentation
+- Created example app demonstrating usage
+- Improved package score to 160/160 points
+- Added detailed code examples and usage instructions
+
 ## 1.0.0
 
 - Initial release of flutter_safe_setstate
