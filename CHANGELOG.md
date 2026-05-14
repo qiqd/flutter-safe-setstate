@@ -12,3 +12,7 @@
 - Includes comprehensive test coverage
 - Fully null-safe implementation
 - Lightweight with no additional dependencies
+
+## 1.0.2
+
+- Modified the method parameter name to callback

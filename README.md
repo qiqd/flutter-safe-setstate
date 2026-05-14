@@ -15,7 +15,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_safe_setstate: ^1.0.0
+  flutter_safe_setstate: ^1.0.2
 ```
 
 Then run:

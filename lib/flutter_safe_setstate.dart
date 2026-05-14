@@ -36,10 +36,10 @@ extension FlutterSafeSetState<T extends StatefulWidget> on State<T> {
   /// See also:
   /// * [setState] - The original Flutter setState method
   /// * [mounted] - Property that indicates if the widget is still in the tree
-  void safeSetState(void Function() fn) {
+  void safeSetState(VoidCallback callback) {
     if (mounted) {
       // ignore: invalid_use_of_protected_member
-      setState(fn);
+      setState(callback);
     }
   }
 }
