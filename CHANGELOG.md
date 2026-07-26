@@ -1,4 +1,4 @@
-## 1.1.0
+## 1.1.2
 
 - Added `onUnmounted` optional callback parameter for error handling
 - Added try-catch exception handling

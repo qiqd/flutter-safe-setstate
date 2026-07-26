@@ -17,7 +17,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_safe_setstate: ^1.1.0
+  flutter_safe_setstate: ^1.1.2
 ```
 
 Then run:
@@ -67,7 +67,7 @@ class _MyWidgetState extends State<MyWidget> {
 
 When using `setState` in asynchronous operations (like API calls), the widget might get disposed before the operation completes. This causes Flutter to throw an error:
 
-```dart
+````dart
 // ❌ This can cause errors if the widget is disposed
 Future<void> fetchData() async {
   final data = await api.getData();
@@ -84,7 +84,7 @@ Future<void> fetchData() async {
     _data = data;
   });
 }
-```
+````
 
 ### Using return value and onUnmounted callback
 
@@ -93,7 +93,7 @@ The `safeSetState` method returns a `bool` indicating whether setState was calle
 ```dart
 Future<void> fetchData() async {
   final data = await api.getData();
-  
+
   final success = safeSetState(
     () {
       _data = data;
@@ -102,7 +102,7 @@ Future<void> fetchData() async {
       print('Widget was disposed before setState could be called: $error');
     },
   );
-  
+
   if (!success) {
     print('setState was not called because widget is disposed');
   }
