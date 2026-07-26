@@ -8,6 +8,8 @@ A Flutter package that provides a safe setState extension to prevent calling set
 - 🎯 **Null-safe**: Fully supports null safety
 - 📦 **Lightweight**: No additional dependencies required
 - 🔧 **Easy to use**: Simple extension method on State
+- 📤 **Return value**: Returns `bool` indicating whether setState was called successfully
+- 🚨 **Error handling**: Optional `onUnmounted` callback for handling errors when widget is disposed
 
 ## Getting started
 
@@ -15,7 +17,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_safe_setstate: ^1.0.2
+  flutter_safe_setstate: ^1.1.0
 ```
 
 Then run:
@@ -74,12 +76,36 @@ Future<void> fetchData() async {
   });
 }
 
+```dart
 // ✅ This is safe
 Future<void> fetchData() async {
   final data = await api.getData();
   safeSetState(() {
     _data = data;
   });
+}
+```
+
+### Using return value and onUnmounted callback
+
+The `safeSetState` method returns a `bool` indicating whether setState was called successfully. You can also provide an optional `onUnmounted` callback to handle errors when the widget is disposed:
+
+```dart
+Future<void> fetchData() async {
+  final data = await api.getData();
+  
+  final success = safeSetState(
+    () {
+      _data = data;
+    },
+    onUnmounted: (error) {
+      print('Widget was disposed before setState could be called: $error');
+    },
+  );
+  
+  if (!success) {
+    print('setState was not called because widget is disposed');
+  }
 }
 ```
 

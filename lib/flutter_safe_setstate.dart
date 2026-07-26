@@ -22,6 +22,14 @@ extension FlutterSafeSetState<T extends StatefulWidget> on State<T> {
   /// a possibility that the widget might be disposed before the state update
   /// occurs, such as in asynchronous operations.
   ///
+  /// [callback] is the function to execute when the widget is mounted.
+  ///
+  /// [onUnmounted] is an optional callback that is called if an error occurs
+  /// during the setState operation. The error object is passed as a parameter.
+  ///
+  /// Returns `true` if setState was called successfully, `false` if the widget
+  /// was not mounted or an error was caught.
+  ///
   /// Example:
   /// ```dart
   /// Future<void> fetchData() async {
@@ -33,13 +41,41 @@ extension FlutterSafeSetState<T extends StatefulWidget> on State<T> {
   /// }
   /// ```
   ///
+  /// Example with error handling and return value:
+  /// ```dart
+  /// Future<void> fetchData() async {
+  ///   final data = await api.getData();
+  ///   final success = safeSetState(
+  ///     () {
+  ///       _data = data;
+  ///     },
+  ///     onUnmounted: (error) {
+  ///       print('Error occurred: $error');
+  ///     },
+  ///   );
+  ///   if (!success) {
+  ///     print('State was not updated');
+  ///   }
+  /// }
+  /// ```
+  ///
   /// See also:
   /// * [setState] - The original Flutter setState method
   /// * [mounted] - Property that indicates if the widget is still in the tree
-  void safeSetState(VoidCallback callback) {
-    if (mounted) {
-      // ignore: invalid_use_of_protected_member
-      setState(callback);
+  bool safeSetState(
+    VoidCallback callback, {
+    void Function(dynamic e)? onUnmounted,
+  }) {
+    try {
+      if (mounted) {
+        // ignore: invalid_use_of_protected_member
+        setState(callback);
+        return true;
+      }
+    } catch (e) {
+      onUnmounted?.call(e);
+      return false;
     }
+    return false;
   }
 }

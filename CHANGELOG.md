@@ -1,3 +1,9 @@
+## 1.1.0
+
+- Added `onUnmounted` optional callback parameter for error handling
+- Added try-catch exception handling
+- Changed return type from `void` to `bool` indicating whether setState was called successfully
+
 ## 1.0.2
 
 - Modified the method parameter name to callback

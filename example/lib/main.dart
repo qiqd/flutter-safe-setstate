@@ -52,10 +52,19 @@ class _SafeSetStateDemoState extends State<SafeSetStateDemo> {
   }
 
   void _incrementDirectly() {
-    safeSetState(() {
-      _counter++;
-      _status = 'Incremented directly';
-    });
+    final success = safeSetState(
+      () {
+        _counter++;
+        _status = 'Incremented directly';
+      },
+      onUnmounted: (error) {
+        _status = 'Error: $error';
+      },
+    );
+    
+    if (!success) {
+      _status = 'Widget not mounted';
+    }
   }
 
   @override
