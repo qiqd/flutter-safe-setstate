@@ -1,8 +1,54 @@
+## 1.2.0
+
+- Added top-level `safeSetState` function that takes a `State` and forwards to the extension method
+- Added optional named `onError` parameter to the top-level function, matching the extension method
+- Renamed the extension method to `safeSetStateWrapper` to avoid a name clash with the top-level function
+- Updated API documentation with examples and an explanation of how the two entry points differ
+- Updated example app and README to use the new method name and `onError` parameter
+- Added tests covering the top-level function: mounted update, disposed behavior, return value and `onError` forwarding
+
+### Breaking change
+
+- The extension member `safeSetState` has been renamed to `safeSetStateWrapper`. The name `safeSetState` is now used by a top-level function.
+
+### Migration from 1.1.x
+
+- Calling `safeSetState(...)` inside a `State` (extension member) must be changed to `safeSetStateWrapper(...)`:
+
+  ```dart
+  // 1.1.x
+  safeSetState(() {
+    _counter++;
+  });
+
+  // 1.2.0
+  safeSetStateWrapper(() {
+    _counter++;
+  });
+  ```
+
+- If you need to call it on a `State` reference from outside that state, use the new top-level function, which takes the `State` as its first argument:
+
+  ```dart
+  // 1.2.0
+  final success = safeSetState(
+    someState,
+    () {
+      // update that state's data
+    },
+    onError: (error) {
+      print('setState failed: $error');
+    },
+  );
+  ```
+
+- The `onError` parameter keeps the same name and semantics on both entry points.
+
 ## 1.1.2
 
-- Added `onUnmounted` optional callback parameter for error handling
+- Added `onError` optional callback parameter for error handling
 - Added try-catch exception handling
-- Changed return type from `void` to `bool` indicating whether setState was called successfully
+- Changed return type from `void` to `bool` indicating whether setState completed without throwing
 
 ## 1.0.2
 

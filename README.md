@@ -4,12 +4,12 @@ A Flutter package that provides a safe setState extension to prevent calling set
 
 ## Features
 
-- 🔒 **Safe setState**: Automatically checks if the widget is still mounted before calling setState
+- 🔒 **Safe setState**: Wraps setState in a try-catch block so errors from disposed widgets are caught instead of propagated
 - 🎯 **Null-safe**: Fully supports null safety
 - 📦 **Lightweight**: No additional dependencies required
 - 🔧 **Easy to use**: Simple extension method on State
 - 📤 **Return value**: Returns `bool` indicating whether setState was called successfully
-- 🚨 **Error handling**: Optional `onUnmounted` callback for handling errors when widget is disposed
+- 🚨 **Error handling**: Optional `onError` callback for handling errors thrown by setState
 
 ## Getting started
 
@@ -17,7 +17,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_safe_setstate: ^1.1.2
+  flutter_safe_setstate: ^1.2.0
 ```
 
 Then run:
@@ -28,10 +28,10 @@ flutter pub get
 
 ## Usage
 
-Simply import the package and use `safeSetState` instead of `setState`:
+Simply import the package and use `safeSetStateWrapper` instead of `setState`:
 
 ```dart
-import 'package:flutter_safe_setstate/safe_setstate.dart';
+import 'package:flutter_safe_setstate/flutter_safe_setstate.dart';
 
 class MyWidget extends StatefulWidget {
   @override
@@ -42,8 +42,8 @@ class _MyWidgetState extends State<MyWidget> {
   int _counter = 0;
 
   void _incrementCounter() {
-    // Use safeSetState instead of setState
-    safeSetState(() {
+    // Use safeSetStateWrapper instead of setState
+    safeSetStateWrapper(() {
       _counter++;
     });
   }
@@ -63,7 +63,7 @@ class _MyWidgetState extends State<MyWidget> {
 }
 ```
 
-### Why use safeSetState?
+### Why use safeSetStateWrapper?
 
 When using `setState` in asynchronous operations (like API calls), the widget might get disposed before the operation completes. This causes Flutter to throw an error:
 
@@ -80,34 +80,52 @@ Future<void> fetchData() async {
 // ✅ This is safe
 Future<void> fetchData() async {
   final data = await api.getData();
-  safeSetState(() {
+  safeSetStateWrapper(() {
     _data = data;
   });
 }
 ````
 
-### Using return value and onUnmounted callback
+### Using return value and onError callback
 
-The `safeSetState` method returns a `bool` indicating whether setState was called successfully. You can also provide an optional `onUnmounted` callback to handle errors when the widget is disposed:
+The `safeSetStateWrapper` method returns a `bool` indicating whether setState completed without throwing. You can also provide an optional `onError` callback to handle errors caught from setState, e.g. when the widget has already been disposed:
 
 ```dart
 Future<void> fetchData() async {
   final data = await api.getData();
 
-  final success = safeSetState(
+  final success = safeSetStateWrapper(
     () {
       _data = data;
     },
-    onUnmounted: (error) {
-      print('Widget was disposed before setState could be called: $error');
+    onError: (error) {
+      print('setState failed: $error');
     },
   );
 
   if (!success) {
-    print('setState was not called because widget is disposed');
+    print('setState did not complete because an error was caught');
   }
 }
 ```
+
+### Using it as a regular function
+
+An extension method can only be called on a `State` from inside that state. If you hold a `State` reference elsewhere, use the top-level `safeSetState` function instead — it forwards to the extension method:
+
+```dart
+final success = safeSetState(
+  someState,
+  () {
+    // update that state's data
+  },
+  onError: (error) {
+    print('setState failed: $error');
+  },
+);
+```
+
+> Note: `state` must be the `State` that owns the data being updated. Passing an unrelated `State` still compiles but updates the wrong widget.
 
 ## Additional information
 

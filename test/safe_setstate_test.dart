@@ -68,7 +68,36 @@ void main() {
     expect(result, false);
   });
 
-  testWidgets('safeSetState should call onUnmounted callback when error occurs', (
+  testWidgets(
+    'safeSetState should call onError callback when setState throws',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(MaterialApp(home: TestWidget()));
+
+      final testWidgetState = tester.state<TestWidgetState>(
+        find.byType(TestWidget),
+      );
+
+      // Remove the widget from the tree
+      await tester.pumpWidget(MaterialApp(home: Container()));
+
+      bool callbackCalled = false;
+      dynamic capturedError;
+
+      final result = testWidgetState.safeSetStateWrapper(
+        () {},
+        onError: (error) {
+          callbackCalled = true;
+          capturedError = error;
+        },
+      );
+
+      expect(callbackCalled, true);
+      expect(capturedError, isNotNull);
+      expect(result, false);
+    },
+  );
+
+  testWidgets('safeSetState should not call onError when setState succeeds', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(MaterialApp(home: TestWidget()));
@@ -77,21 +106,90 @@ void main() {
       find.byType(TestWidget),
     );
 
-    // Remove the widget from the tree
+    bool callbackCalled = false;
+
+    final result = testWidgetState.safeSetStateWrapper(
+      () {},
+      onError: (error) {
+        callbackCalled = true;
+      },
+    );
+    await tester.pump();
+
+    expect(callbackCalled, false);
+    expect(result, true);
+  });
+
+  testWidgets('top-level safeSetState should update state when mounted', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(MaterialApp(home: TestWidget()));
+
+    final testWidgetState = tester.state<TestWidgetState>(
+      find.byType(TestWidget),
+    );
+
+    expect(testWidgetState.counter, 0);
+
+    final result = testWidgetState.incrementCounterGlobal();
+    await tester.pump();
+
+    expect(result, true);
+    expect(testWidgetState.counter, 1);
+  });
+
+  testWidgets('top-level safeSetState should not throw when disposed', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(MaterialApp(home: TestWidget()));
+
+    final testWidgetState = tester.state<TestWidgetState>(
+      find.byType(TestWidget),
+    );
+
+    await tester.pumpWidget(MaterialApp(home: Container()));
+
+    expect(() => testWidgetState.incrementCounterGlobal(), returnsNormally);
+  });
+
+  testWidgets('top-level safeSetState should return false when disposed', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(MaterialApp(home: TestWidget()));
+
+    final testWidgetState = tester.state<TestWidgetState>(
+      find.byType(TestWidget),
+    );
+
+    await tester.pumpWidget(MaterialApp(home: Container()));
+
+    final result = testWidgetState.incrementCounterGlobal();
+
+    expect(result, false);
+  });
+
+  testWidgets('top-level safeSetState should forward onError callback', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(MaterialApp(home: TestWidget()));
+
+    final testWidgetState = tester.state<TestWidgetState>(
+      find.byType(TestWidget),
+    );
+
     await tester.pumpWidget(MaterialApp(home: Container()));
 
     bool callbackCalled = false;
     dynamic capturedError;
 
-    testWidgetState.safeSetState(
-      () {},
-      onUnmounted: (error) {
-        callbackCalled = true;
-        capturedError = error;
-      },
-    );
+    final result = testWidgetState.incrementCounterGlobalWithOnError((error) {
+      callbackCalled = true;
+      capturedError = error;
+    });
 
-    expect(callbackCalled, false);
+    expect(callbackCalled, true);
+    expect(capturedError, isNotNull);
+    expect(result, false);
   });
 }
 
@@ -106,9 +204,21 @@ class TestWidgetState extends State<TestWidget> {
   int counter = 0;
 
   bool incrementCounter() {
-    return safeSetState(() {
+    return safeSetStateWrapper(() {
       counter++;
     });
+  }
+
+  bool incrementCounterGlobal() {
+    return safeSetState(this, () {
+      counter++;
+    });
+  }
+
+  bool incrementCounterGlobalWithOnError(void Function(dynamic e) onError) {
+    return safeSetState(this, () {
+      counter++;
+    }, onError: onError);
   }
 
   @override

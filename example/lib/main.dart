@@ -31,39 +31,41 @@ class _SafeSetStateDemoState extends State<SafeSetStateDemo> {
   String _status = 'Ready';
 
   Future<void> _incrementWithDelay() async {
-    safeSetState(() {
+    safeSetState(this, () => {}, onError: (e) {});
+
+    safeSetStateWrapper(() {
       _isLoading = true;
       _status = 'Processing...';
     });
 
     await Future.delayed(const Duration(seconds: 2));
 
-    safeSetState(() {
+    safeSetStateWrapper(() {
       _counter++;
       _isLoading = false;
       _status = 'Completed!';
     });
 
     Future.delayed(const Duration(milliseconds: 500), () {
-      safeSetState(() {
+      safeSetStateWrapper(() {
         _status = 'Ready';
       });
     });
   }
 
   void _incrementDirectly() {
-    final success = safeSetState(
+    final success = safeSetStateWrapper(
       () {
         _counter++;
         _status = 'Incremented directly';
       },
-      onUnmounted: (error) {
+      onError: (error) {
         _status = 'Error: $error';
       },
     );
-    
+
     if (!success) {
-      _status = 'Widget not mounted';
+      _status = 'Widget not updated';
     }
   }
 
